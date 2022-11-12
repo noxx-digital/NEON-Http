@@ -97,7 +97,7 @@ class HttpStream
      */
     public function tell(): int
     {
-        if( $pos = ftell( $this->stream ) !== FALSE )
+        if( ($pos = ftell( $this->stream )) !== FALSE )
             return $pos;
         else
            throw new RuntimeException('');
@@ -193,7 +193,7 @@ class HttpStream
      */
     public function write( string $string ): int
     {
-        if( $write = fwrite( $this->stream, $string, strlen( $string )) )
+        if(( $write = fwrite( $this->stream, $string, strlen( $string ))) !== FALSE )
             return $write;
         else
             throw new RuntimeException('Cannot write to stream.');
