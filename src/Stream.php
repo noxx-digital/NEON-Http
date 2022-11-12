@@ -4,7 +4,7 @@ namespace Neon\Http;
 
 use RuntimeException;
 
-class HttpStream
+class Stream
 {
     protected $stream;
 

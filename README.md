@@ -2,12 +2,13 @@
 
 
 ## Usage
+
 ```php
 namespace Neon\Http;
 
 require __DIR__ . '/../vendor/autoload.php';
 
-$stream = new HttpStream( 'a+' );
+$stream = new Stream( 'a+' );
 
 $stream->write( 'Hello World!' );
 $stream->rewind();
