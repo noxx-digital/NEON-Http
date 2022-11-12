@@ -15,8 +15,8 @@ class Uri implements UriInterface
 
     public function __construct( private string $uri )
     {
-        $this->scheme       = ( $scheme = strtolower( parse_url( $this->uri, PHP_URL_SCHEME ))) ? $scheme : '';
-        $this->user         = ( $scheme = strtolower( parse_url( $this->uri, PHP_URL_USER ))) ? $scheme : '';
+        $this->scheme       = ( $scheme = parse_url( $this->uri, PHP_URL_SCHEME )) ? strtolower( $scheme ) : '';
+        $this->user         = ( $scheme = parse_url( $this->uri, PHP_URL_USER )) ? strtolower( $scheme ) : '';
         $this->pass         = ( $scheme = parse_url( $this->uri, PHP_URL_PASS )) ? $scheme : '';
         $this->host         = ( $scheme = strtolower( parse_url( $this->uri, PHP_URL_HOST ))) ? $scheme : '';
         $this->port         = parse_url( $this->uri, PHP_URL_PORT );
@@ -38,9 +38,22 @@ class Uri implements UriInterface
      */
     public function get_authority(): string
     {
+        $authority = '';
 
+        if ( !empty( $user_info = $this->get_user_info() ) )
+            $authority .= $user_info;
+
+        if ( !empty( $user_info ) && !empty( $this->host ) )
+            $authority .= '@';
+
+        if ( !empty( $this->host ) )
+            $authority .= $this->host;
+
+        if ( !empty( $this->host ) && ( $this->port !== NULL ) )
+            $authority .= ':' . $this->port;
+
+        return $authority;
     }
-
     /**
      * @inheritDoc
      */
@@ -97,7 +110,7 @@ class Uri implements UriInterface
     /**
      * @inheritDoc
      */
-    public function get_fragment()
+    public function get_fragment(): string
     {
         return rawurlencode( $this->fragement );
     }
@@ -105,17 +118,22 @@ class Uri implements UriInterface
     /**
      * @inheritDoc
      */
-    public function with_scheme( $scheme )
+    public function with_scheme( $scheme ): Uri|UriInterface
     {
-        return $this;
+        $new = clone $this;
+        $new->scheme = $scheme;
+        return $new;
     }
 
     /**
      * @inheritDoc
      */
-    public function with_user_info( $user, $password = null )
+    public function with_user_info( $user, $password=NULL )
     {
-        return $this;
+        $new = clone $this;
+        $new->user = $user;
+        $new->pass = ( $password ) ? $password : '';
+        return $new;
     }
 
     /**
@@ -123,7 +141,8 @@ class Uri implements UriInterface
      */
     public function with_host( $host )
     {
-        // TODO: Implement with_host() method.
+        $new = clone $this;
+        $new->host = $host;
         return $this;
     }
 
@@ -132,7 +151,8 @@ class Uri implements UriInterface
      */
     public function with_port( $port )
     {
-        // TODO: Implement with_port() method.
+        $new = clone $this;
+        $new->port = $port;
         return $this;
     }
 
@@ -141,7 +161,8 @@ class Uri implements UriInterface
      */
     public function with_path( $path )
     {
-        // TODO: Implement with_path() method.
+        $new = clone $this;
+        $new->path = $path;
         return $this;
     }
 
@@ -150,7 +171,8 @@ class Uri implements UriInterface
      */
     public function with_query( $query )
     {
-        // TODO: Implement with_query() method.
+        $new = clone $this;
+        $new->query = $query;
         return $this;
     }
 
@@ -159,7 +181,8 @@ class Uri implements UriInterface
      */
     public function with_fragment( $fragment )
     {
-        // TODO: Implement with_fragment() method.
+        $new = clone $this;
+        $new->fragement = $fragment;
         return $this;
     }
 
@@ -168,6 +191,13 @@ class Uri implements UriInterface
      */
     public function __toString()
     {
-       return $this->get_scheme().'://'.$this->get_authority().$this->get_path().$this->get_query().$this->get_fragment();
+        $uri = '';
+        if( !empty( $this->get_scheme() ))
+            $uri .= $this->get_scheme().':';
+
+        if( !empty( $this->get_authority()  ))
+            $uri .= '//'.$this->get_authority();
+
+       return $uri.$this->get_path().$this->get_query().$this->get_fragment();
     }
 }
