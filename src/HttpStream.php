@@ -11,7 +11,7 @@ class HttpStream
     /**
      * @throws ArgumentException
      */
-    public function __construct(
+    public final function __construct(
         private readonly string $mode
     )
     {
@@ -48,7 +48,7 @@ class HttpStream
      * @see http://php.net/manual/en/language.oop5.magic.php#object.tostring
      * @return string
      */
-    public function __toString(): string
+    public final function __toString(): string
     {
         $this->rewind();
         return $this->read( $this->get_size() );
@@ -60,7 +60,7 @@ class HttpStream
      *
      * @return void
      */
-    public function close(): void
+    public final function close(): void
     {
        fclose( $this->stream );
     }
@@ -82,7 +82,7 @@ class HttpStream
      *
      * @return int|null Returns the size in bytes if known, or null if unknown.
      */
-    public function get_size(): int|null
+    public final function get_size(): int|null
     {
         return fstat( $this->stream )['size'];
     }
@@ -93,7 +93,7 @@ class HttpStream
      * @return int Position of the file pointer
      * @throws \RuntimeException on error.
      */
-    public function tell(): int
+    public final function tell(): int
     {
         if(( $pos = ftell( $this->stream )) === FALSE )
             throw new RuntimeException('');
@@ -105,7 +105,7 @@ class HttpStream
      *
      * @return bool
      */
-    public function eof(): bool
+    public final function eof(): bool
     {
         return feof( $this->stream );
     }
@@ -115,7 +115,7 @@ class HttpStream
      *
      * @return bool
      */
-    public function is_seekable(): bool
+    public final function is_seekable(): bool
     {
         return stream_get_meta_data( $this->stream )['seekable'];
     }
@@ -132,7 +132,7 @@ class HttpStream
      *     SEEK_END: Set position to end-of-stream plus offset.
      * @throws \RuntimeException on failure.
      */
-    public function seek( int $offset, int $whence=SEEK_SET ): void
+    public final function seek( int $offset, int $whence=SEEK_SET ): void
     {
         if( fseek( $this->stream, $offset, $whence ) === -1 )
             throw new RuntimeException('Stream is not seekable.');
@@ -148,7 +148,7 @@ class HttpStream
      * @link http://www.php.net/manual/en/function.fseek.php
      * @throws \RuntimeException on failure.
      */
-    public function rewind(): void
+    public final function rewind(): void
     {
        if( !rewind( $this->stream ))
            throw new RuntimeException('Stream is not seekable.');
@@ -159,7 +159,7 @@ class HttpStream
      *
      * @return bool
      */
-    public function is_writable(): bool
+    public final function is_writable(): bool
     {
         if(
             $this->mode === 'r+' ||
@@ -184,7 +184,7 @@ class HttpStream
      * @return int Returns the number of bytes written to the stream.
      * @throws \RuntimeException on failure.
      */
-    public function write( string $string ): int
+    public final function write( string $string ): int
     {
         if(( $write = fwrite( $this->stream, $string, strlen( $string ))) === FALSE )
             throw new RuntimeException('Cannot write to stream.');
@@ -197,7 +197,7 @@ class HttpStream
      *
      * @return bool
      */
-    public function is_readable(): bool
+    public final function is_readable(): bool
     {
         if(
             $this->mode === 'r' ||
@@ -222,7 +222,7 @@ class HttpStream
      *     if no bytes are available.
      * @throws \RuntimeException if an error occurs.
      */
-    public function read( int $length ): string
+    public final function read( int $length ): string
     {
         if(( $read = fread( $this->stream, $length )) === FALSE )
             throw new RuntimeException('Cannot read from stream.');
@@ -237,7 +237,7 @@ class HttpStream
      * @throws \RuntimeException if unable to read or an error occurs while
      *     reading.
      */
-    public function get_contents(): string
+    public final function get_contents(): string
     {
         return $this->read( $this->get_size() - $this->tell() );
     }
@@ -254,7 +254,7 @@ class HttpStream
      *     provided. Returns a specific key value if a key is provided and the
      *     value is found, or null if the key is not found.
      */
-    public function get_metadata( string $key=NULL )
+    public final function get_metadata( string $key=NULL )
     {
         $meta_data = stream_get_meta_data( $this->stream );
         if( $key === NULL )
