@@ -98,8 +98,8 @@ class HttpStream
      */
     public function tell(): int
     {
-
-       return ftell( $this->stream );
+        if( ftell( $this->stream ) === FALSE )
+           throw new RuntimeException('');
     }
 
     /**
@@ -136,7 +136,8 @@ class HttpStream
      */
     public function seek( int $offset, int $whence=SEEK_SET ): void
     {
-        fseek( $this->stream, $offset, $whence );
+        if( fseek( $this->stream, $offset, $whence ) === -1 )
+            throw new RuntimeException('Stream is not seekable.');
     }
 
     /**
@@ -151,7 +152,8 @@ class HttpStream
      */
     public function rewind(): void
     {
-       rewind( $this->stream );
+       if( !rewind( $this->stream ))
+           throw new RuntimeException('Stream is not seekable.');
     }
 
     /**
@@ -250,7 +252,19 @@ class HttpStream
         $this->read( $this->get_size() - $this->tell() );
     }
 
-    public function get_metadata( $key=NULL )
+    /**
+     * Get stream metadata as an associative array or retrieve a specific key.
+     *
+     * The keys returned are identical to the keys returned from PHP's
+     * stream_get_meta_data() function.
+     *
+     * @link http://php.net/manual/en/function.stream-get-meta-data.php
+     * @param string|null $key Specific metadata to retrieve.
+     * @return array|mixed|null Returns an associative array if no key is
+     *     provided. Returns a specific key value if a key is provided and the
+     *     value is found, or null if the key is not found.
+     */
+    public function get_metadata( string $key=NULL )
     {
         $meta_data = stream_get_meta_data();
         if( $key === NULL )
