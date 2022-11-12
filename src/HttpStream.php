@@ -3,7 +3,6 @@
 namespace Neon\Http;
 
 use RuntimeException;
-use Trinity\http\ArgumentException;
 
 class HttpStream
 {
@@ -98,7 +97,9 @@ class HttpStream
      */
     public function tell(): int
     {
-        if( ftell( $this->stream ) === FALSE )
+        if( $pos = ftell( $this->stream ) !== FALSE )
+            return $pos;
+        else
            throw new RuntimeException('');
     }
 
@@ -249,7 +250,7 @@ class HttpStream
      */
     public function get_contents(): string
     {
-        $this->read( $this->get_size() - $this->tell() );
+        return $this->read( $this->get_size() - $this->tell() );
     }
 
     /**
@@ -266,7 +267,7 @@ class HttpStream
      */
     public function get_metadata( string $key=NULL )
     {
-        $meta_data = stream_get_meta_data();
+        $meta_data = stream_get_meta_data( $this->stream );
         if( $key === NULL )
             return $meta_data;
         elseif( key_exists( $key, $meta_data ) )
