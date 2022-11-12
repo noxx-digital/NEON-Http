@@ -16,24 +16,22 @@ class HttpStream
     )
     {
         if(
-            $this->mode === 'r' ||
-            $this->mode === 'r+' ||
-            $this->mode === 'w' ||
-            $this->mode === 'w+' ||
-            $this->mode === 'a' ||
-            $this->mode === 'a+' ||
-            $this->mode === 'x' ||
-            $this->mode === 'x+' ||
-            $this->mode === 'c' ||
-            $this->mode === 'c+'
+            $this->mode !== 'r' &&
+            $this->mode !== 'r+' &&
+            $this->mode !== 'w' &&
+            $this->mode !== 'w+' &&
+            $this->mode !== 'a' &&
+            $this->mode !== 'a+' &&
+            $this->mode !== 'x' &&
+            $this->mode !== 'x+' &&
+            $this->mode !== 'c' &&
+            $this->mode !== 'c+'
         )
-        {
-            $this->stream = fopen( 'php://temp', $this->mode );
-        }
-        else
         {
             throw new ArgumentException('Not existing mode Provided.');
         }
+
+        $this->stream = fopen( 'php://temp', $this->mode );
     }
 
     /**
@@ -97,10 +95,9 @@ class HttpStream
      */
     public function tell(): int
     {
-        if( ($pos = ftell( $this->stream )) !== FALSE )
-            return $pos;
-        else
-           throw new RuntimeException('');
+        if(( $pos = ftell( $this->stream )) === FALSE )
+            throw new RuntimeException('');
+        return $pos;
     }
 
     /**
@@ -175,13 +172,9 @@ class HttpStream
             $this->mode === 'c' ||
             $this->mode === 'c+'
         )
-        {
             return TRUE;
-        }
         else
-        {
             return FALSE;
-        }
     }
 
     /**
@@ -193,10 +186,10 @@ class HttpStream
      */
     public function write( string $string ): int
     {
-        if(( $write = fwrite( $this->stream, $string, strlen( $string ))) !== FALSE )
-            return $write;
-        else
+        if(( $write = fwrite( $this->stream, $string, strlen( $string ))) === FALSE )
             throw new RuntimeException('Cannot write to stream.');
+
+        return $write;
     }
 
     /**
@@ -214,13 +207,9 @@ class HttpStream
             $this->mode === 'x+' ||
             $this->mode === 'c+'
         )
-        {
             return TRUE;
-        }
         else
-        {
             return FALSE;
-        }
     }
 
     /**
@@ -235,10 +224,10 @@ class HttpStream
      */
     public function read( int $length ): string
     {
-        if( $read = fread( $this->stream, $length ))
-            return $read;
-        else
+        if(( $read = fread( $this->stream, $length )) === FALSE )
             throw new RuntimeException('Cannot read from stream.');
+
+        return $read;
     }
 
     /**
