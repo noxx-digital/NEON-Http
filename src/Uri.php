@@ -13,6 +13,9 @@ class Uri implements UriInterface
     private ?string $query;
     private ?string $fragement;
 
+	/**
+	 * @param string $uri
+	 */
     public function __construct( private string $uri )
     {
         $this->scheme       = ( $scheme = parse_url( $this->uri, PHP_URL_SCHEME )) ? strtolower( $scheme ) : '';
@@ -38,21 +41,25 @@ class Uri implements UriInterface
      */
     public function get_authority(): string
     {
-        $authority = '';
+        if( empty( $this->host ))
+		{
+			return '';
+		}
+        else
+		{
+			$authority = '';
+			$user_info = $this->get_user_info();
 
-        if ( !empty( $user_info = $this->get_user_info() ) )
-            $authority .= $user_info;
+			if ( !empty( $user_info ))
+				$authority .= $user_info.'@';;
 
-        if ( !empty( $user_info ) && !empty( $this->host ) )
-            $authority .= '@';
+			$authority .=  $this->host;
 
-        if ( !empty( $this->host ) )
-            $authority .= $this->host;
+			if( $this->port !== NULL )
+            	$authority .= ':' . $this->port;
 
-        if ( !empty( $this->host ) && ( $this->port !== NULL ) )
-            $authority .= ':' . $this->port;
-
-        return $authority;
+ 			return $authority;
+		}
     }
     /**
      * @inheritDoc
