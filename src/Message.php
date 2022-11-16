@@ -1,120 +1,78 @@
 <?php
 	namespace Neon\Http;
-	require_once 'MessageInterface.php';
 
+    use Neon\Http\Stream;
 
-	class Message implements \Psr\Http\Message\MessageInterface
+	abstract class Message
 	{
+        private array $header;
+
 		private string $protocol_version;
-		private array $header;
 
-		public function __construct()
+        private Stream $body;
+
+		public function __construct( array $header=[], Stream $body=NULL )
 		{
-			$this->header = getallheaders();
+            if( sizeof( $header ) > 0 )
+                $this->header = $header;
 
-			foreach( $this->header as $key => $item )
-			{
-				$this->header[$key] = str_replace( ',', ', ', $this->header[$key] );
-				$this->header[$key] = explode( ', ', $this->header[$key] );
-			}
+            if( $body )
+                $this->body = $body;
+            else
+                $this->body = new Stream( 'r+' );
 
 			$this->protocol_version = $_SERVER['SERVER_PROTOCOL'];
 		}
 
-		private function normalize_delemiter( string $header_value, $delemiter_from=',', $delemiter_to=', ' )
-		{
-			for( $i = 0; $i < strlen( $header_value); $i++ )
-			{
-				if( $header_value[$i] === ',' && $header_value[$i+1] !== ' ' ))
-			}
-		}
-
-		/**
-		 * @inheritDoc
-		 */
-		public function get_protocol_version()
+		public function get_protocol_version(): string
 		{
 			return $this->protocol_version;
 		}
 
-		/**
-		 * @inheritDoc
-		 */
-		public function with_protocol_version( $version )
-		{
-
-		}
-
-		/**
-		 * @inheritDoc
-		 */
-		public function get_headers()
-		{
-			// TODO: Implement get_headers() method.
+		public function get_headers(): array
+        {
 			return $this->header;
 		}
 
-		/**
-		 * @inheritDoc
-		 */
-		public function has_header( $name )
+		public function has_header( $name ): bool
 		{
-			// TODO: Implement has_header() method.
+			return key_exists( $name, $this->header );
 		}
 
-		/**
-		 * @inheritDoc
-		 */
-		public function get_header( $name )
-		{
-			// TODO: Implement get_header() method.
+		public function get_header( string $name ): string
+        {
+			if( $this->has_header( $name ))
+                return $this->header[$name];
+            else
+                return '';
 		}
 
-		/**
-		 * @inheritDoc
-		 */
-		public function get_header_line( $name )
+		public function get_header_line( string $name ): string
 		{
-			// TODO: Implement get_header_line() method.
+            if( $this->has_header( $name ))
+			    return $name.': '.$this->header[$name];
+            else
+                return '';
 		}
 
-		/**
-		 * @inheritDoc
-		 */
-		public function with_header( $name, $value )
+		public function set_header( string $name, string $value ): void
 		{
-			// TODO: Implement with_header() method.
+			$this->header[$name] = $value;
 		}
 
-		/**
-		 * @inheritDoc
-		 */
-		public function with_added_header( $name, $value )
+		public function remove_header( string $name ): void
 		{
-			// TODO: Implement with_added_header() method.
+            if( $this->has_header( $name ))
+                unset( $this->header[$name] );
 		}
 
-		/**
-		 * @inheritDoc
-		 */
-		public function without_header( $name )
+		public function get_body(): Stream
 		{
-			// TODO: Implement without_header() method.
+            return $this->body;
 		}
 
-		/**
-		 * @inheritDoc
-		 */
-		public function get_body()
-		{
-			// TODO: Implement get_body() method.
-		}
-
-		/**
-		 * @inheritDoc
-		 */
-		public function with_body( StreamInterface|\Psr\Http\Message\StreamInterface $body )
-		{
-			// TODO: Implement with_body() method.
-		}
+        public function set_body( Stream $body ): void
+        {
+            $this->body = $body;
+        }
 	}

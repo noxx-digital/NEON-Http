@@ -1,0 +1,17 @@
+{
+    "name": "noxx/neon-http",
+    "type": "library",
+    "license": "MIT",
+    "version": "0.1.0",
+    "autoload": {
+        "psr-4": {
+            "Noxx\\NeonHttp\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Noxx",
+            "email": "dev@noxx.digital"
+        }
+    ]
+}

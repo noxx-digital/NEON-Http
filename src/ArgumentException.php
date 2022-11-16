@@ -2,7 +2,4 @@
 
 namespace Neon\Http;
 
-class ArgumentException extends \Exception
-{
-
-}
+class ArgumentException extends \Exception { }

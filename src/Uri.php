@@ -125,72 +125,58 @@ class Uri implements UriInterface
     /**
      * @inheritDoc
      */
-    public function with_scheme( $scheme ): Uri|UriInterface
+    public function set_scheme( $scheme ): Uri|UriInterface
     {
-        $new = clone $this;
-        $new->scheme = $scheme;
-        return $new;
+        $this->scheme = $scheme;
     }
 
     /**
      * @inheritDoc
      */
-    public function with_user_info( $user, $password=NULL )
+    public function set_user_info( $user, $password=NULL ): Uri|UriInterface
     {
-        $new = clone $this;
-        $new->user = $user;
-        $new->pass = ( $password ) ? $password : '';
-        return $new;
+        $this->user = $user;
+        $this->pass = ( $password ) ? $password : '';
     }
 
     /**
      * @inheritDoc
      */
-    public function with_host( $host )
+    public function set_host( $host ): Uri|UriInterface|static
     {
-        $new = clone $this;
-        $new->host = $host;
-        return $this;
+       $this->host = $host;
     }
 
     /**
      * @inheritDoc
      */
-    public function with_port( $port )
+    public function set_port( $port ): Uri|UriInterface|static
     {
-        $new = clone $this;
-        $new->port = $port;
-        return $this;
+        $this->port = $port;
     }
 
     /**
      * @inheritDoc
      */
-    public function with_path( $path )
+    public function set_path( $path ): Uri|UriInterface|static
     {
-        $new = clone $this;
-        $new->path = $path;
-        return $this;
+        $this->path = $path;
     }
 
     /**
      * @inheritDoc
      */
-    public function with_query( $query )
+    public function set_query( $query ): Uri|UriInterface|static
     {
-        $new = clone $this;
-        $new->query = $query;
-        return $this;
+        $this->query = $query;
     }
 
     /**
      * @inheritDoc
      */
-    public function with_fragment( $fragment )
+    public function set_fragment( $fragment )
     {
-        $new = clone $this;
-        $new->fragement = $fragment;
-        return $this;
+        $this->fragement = $fragment;
     }
 
     /**
