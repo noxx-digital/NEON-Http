@@ -9,29 +9,10 @@ class Stream
     protected $stream;
 
     /**
-     * @throws ArgumentException
      */
-    public final function __construct(
-        private readonly string $mode
-    )
+    public final function __construct()
     {
-        if(
-            $this->mode !== 'r' &&
-            $this->mode !== 'r+' &&
-            $this->mode !== 'w' &&
-            $this->mode !== 'w+' &&
-            $this->mode !== 'a' &&
-            $this->mode !== 'a+' &&
-            $this->mode !== 'x' &&
-            $this->mode !== 'x+' &&
-            $this->mode !== 'c' &&
-            $this->mode !== 'c+'
-        )
-        {
-            throw new ArgumentException('Not existing mode Provided.');
-        }
-
-        $this->stream = fopen( 'php://temp', $this->mode );
+        $this->stream = fopen( 'php://temp', 'r+' );
     }
 
     /**
@@ -111,7 +92,7 @@ class Stream
     }
 
     /**
-     * Returns whether or not the stream is seekable.
+     * Returns whether the stream is seekable.
      *
      * @return bool
      */
@@ -155,29 +136,6 @@ class Stream
     }
 
     /**
-     * Returns whether or not the stream is writable.
-     *
-     * @return bool
-     */
-    public final function is_writable(): bool
-    {
-        if(
-            $this->mode === 'r+' ||
-            $this->mode === 'w' ||
-            $this->mode === 'w+' ||
-            $this->mode === 'a' ||
-            $this->mode === 'a+' ||
-            $this->mode === 'x' ||
-            $this->mode === 'x+' ||
-            $this->mode === 'c' ||
-            $this->mode === 'c+'
-        )
-            return TRUE;
-        else
-            return FALSE;
-    }
-
-    /**
      * Write data to the stream.
      *
      * @param string $string The string that is to be written.
@@ -193,26 +151,6 @@ class Stream
     }
 
     /**
-     * Returns whether or not the stream is readable.
-     *
-     * @return bool
-     */
-    public final function is_readable(): bool
-    {
-        if(
-            $this->mode === 'r' ||
-            $this->mode === 'r+' ||
-            $this->mode === 'w+' ||
-            $this->mode === 'a+' ||
-            $this->mode === 'x+' ||
-            $this->mode === 'c+'
-        )
-            return TRUE;
-        else
-            return FALSE;
-    }
-
-    /**
      * Read data from the stream.
      *
      * @param int $length Read up to $length bytes from the object and return
@@ -224,7 +162,10 @@ class Stream
      */
     public final function read( int $length ): string
     {
-        if(( $read = fread( $this->stream, $length )) === FALSE )
+        if( $this->get_size() == 0 )
+            return '';
+
+        if( !( $read = fread( $this->stream, $length )))
             throw new RuntimeException('Cannot read from stream.');
 
         return $read;

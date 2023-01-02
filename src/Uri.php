@@ -2,13 +2,15 @@
 
 namespace Neon\Http;
 
-class Uri implements UriInterface
+use function Neon\Util\dump;
+
+class Uri
 {
     private ?string $scheme;
     private ?string $user;
     private ?string $pass;
     private ?string $host;
-    private ?int $port;
+    private ?string $port;
     private ?string $path;
     private ?string $query;
     private ?string $fragement;
@@ -16,16 +18,21 @@ class Uri implements UriInterface
 	/**
 	 * @param string $uri
 	 */
-    public function __construct( private string $uri )
+    public function __construct( private readonly string $uri )
     {
-        $this->scheme       = ( $scheme = parse_url( $this->uri, PHP_URL_SCHEME )) ? strtolower( $scheme ) : '';
-        $this->user         = ( $scheme = parse_url( $this->uri, PHP_URL_USER )) ? strtolower( $scheme ) : '';
-        $this->pass         = ( $scheme = parse_url( $this->uri, PHP_URL_PASS )) ? $scheme : '';
-        $this->host         = ( $scheme = strtolower( parse_url( $this->uri, PHP_URL_HOST ))) ? $scheme : '';
-        $this->port         = parse_url( $this->uri, PHP_URL_PORT );
-        $this->path         = ( $scheme = strtolower( parse_url( $this->uri, PHP_URL_PATH ))) ? $scheme : '';
-        $this->query        = ( $scheme = strtolower( parse_url( $this->uri, PHP_URL_QUERY ))) ? $scheme : '';
-        $this->fragement    = ( $scheme = strtolower( parse_url( $this->uri, PHP_URL_FRAGMENT ))) ? $scheme : '';
+        $this->scheme       = $this->parse_component( PHP_URL_SCHEME );
+        $this->user         = $this->parse_component( PHP_URL_USER );
+        $this->pass         = $this->parse_component( PHP_URL_PASS );
+        $this->host         = $this->parse_component( PHP_URL_HOST );
+        $this->port         = $this->parse_component( PHP_URL_PORT );
+        $this->path         = $this->parse_component( PHP_URL_SCHEME );
+        $this->query        = $this->parse_component( PHP_URL_QUERY );
+        $this->fragement    = $this->parse_component( PHP_URL_FRAGMENT );
+    }
+
+    private function parse_component( int $component ): string
+    {
+        return ( $val = parse_url( $this->uri, $component )) ? strtolower( $val ) : '';
     }
 
     /**
@@ -104,14 +111,26 @@ class Uri implements UriInterface
     }
 
     /**
+     * @return string
+     */
+    public function get_query_string(): string
+    {
+        return $this->query;
+    }
+
+    /**
      * @inheritDoc
      */
-    public function get_query(): string
+    public function get_query_data(): array
     {
-        $query = $this->query[0];
-        if( $query === '&' )
-            $query = substr( $query, 1 );
-        return rawurlencode( $query );
+        $fields = explode( '&', $this->query );
+        $query_arr = [];
+        foreach ( $fields as $key => $val )
+        {
+            $tmp = explode( '=', $val );
+            $query_arr[$tmp[0]] = $tmp[1];
+        }
+        return $query_arr;
     }
 
     /**
@@ -125,7 +144,7 @@ class Uri implements UriInterface
     /**
      * @inheritDoc
      */
-    public function set_scheme( $scheme ): Uri|UriInterface
+    public function set_scheme( $scheme ): void
     {
         $this->scheme = $scheme;
     }
@@ -133,7 +152,7 @@ class Uri implements UriInterface
     /**
      * @inheritDoc
      */
-    public function set_user_info( $user, $password=NULL ): Uri|UriInterface
+    public function set_user_info( $user, $password=NULL ): void
     {
         $this->user = $user;
         $this->pass = ( $password ) ? $password : '';
@@ -142,7 +161,7 @@ class Uri implements UriInterface
     /**
      * @inheritDoc
      */
-    public function set_host( $host ): Uri|UriInterface|static
+    public function set_host( $host ): void
     {
        $this->host = $host;
     }
@@ -150,7 +169,7 @@ class Uri implements UriInterface
     /**
      * @inheritDoc
      */
-    public function set_port( $port ): Uri|UriInterface|static
+    public function set_port( $port ): void
     {
         $this->port = $port;
     }
@@ -158,7 +177,7 @@ class Uri implements UriInterface
     /**
      * @inheritDoc
      */
-    public function set_path( $path ): Uri|UriInterface|static
+    public function set_path( $path ): void
     {
         $this->path = $path;
     }
@@ -166,7 +185,7 @@ class Uri implements UriInterface
     /**
      * @inheritDoc
      */
-    public function set_query( $query ): Uri|UriInterface|static
+    public function set_query( $query ): void
     {
         $this->query = $query;
     }
@@ -174,7 +193,7 @@ class Uri implements UriInterface
     /**
      * @inheritDoc
      */
-    public function set_fragment( $fragment )
+    public function set_fragment( $fragment ): void
     {
         $this->fragement = $fragment;
     }
@@ -182,7 +201,7 @@ class Uri implements UriInterface
     /**
      * @inheritDoc
      */
-    public function __toString()
+    public function __toString(): string
     {
         $uri = '';
         if( !empty( $this->get_scheme() ))
