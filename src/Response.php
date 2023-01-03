@@ -8,8 +8,6 @@ class Response extends Message
 {
     private int $status_code;
 
-    // https://httpwg.org/specs/rfc9110.html#overview.of.status.codes
-
     // [Informational 1xx]
     const HTTP_CONTINUE                        = 100;
     const HTTP_SWITCHING_PROTOCOLS             = 101;
@@ -151,7 +149,7 @@ class Response extends Message
     public function register_status_code( int $status_code, string $reason_phrase ): void
     {
         if( !array_key_exists( $this->status_code, $this->http_codes ))
-            $this->http_codes[$status_code] = $reason_phrase;
+            self::$http_codes[$status_code] = $reason_phrase;
         else
             throw new Exception( 'Status code "'.$status_code.'" already exists.' );
     }
@@ -177,7 +175,7 @@ class Response extends Message
      */
     public function get_available_status_codes(): array
     {
-        return $this->http_codes;
+        return self::$http_codes;
     }
 
     /**
@@ -193,7 +191,7 @@ class Response extends Message
      */
     public function get_reason_phrase(): string
     {
-        return $this->http_codes[$this->status_code];
+        return self::$http_codes[$this->status_code];
     }
 }
 

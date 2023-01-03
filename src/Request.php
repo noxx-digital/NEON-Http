@@ -4,6 +4,7 @@ namespace Neon\Http;
 
 // TODO Cookies, files
 
+use Neon\Http\Uri;
 use function Neon\Util\dump;
 
 class Request extends Message

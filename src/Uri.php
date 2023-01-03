@@ -20,19 +20,14 @@ class Uri
 	 */
     public function __construct( private readonly string $uri )
     {
-        $this->scheme       = $this->parse_component( PHP_URL_SCHEME );
-        $this->user         = $this->parse_component( PHP_URL_USER );
-        $this->pass         = $this->parse_component( PHP_URL_PASS );
-        $this->host         = $this->parse_component( PHP_URL_HOST );
-        $this->port         = $this->parse_component( PHP_URL_PORT );
-        $this->path         = $this->parse_component( PHP_URL_SCHEME );
-        $this->query        = $this->parse_component( PHP_URL_QUERY );
-        $this->fragement    = $this->parse_component( PHP_URL_FRAGMENT );
-    }
-
-    private function parse_component( int $component ): string
-    {
-        return ( $val = parse_url( $this->uri, $component )) ? strtolower( $val ) : '';
+        $this->scheme       = ( $scheme = parse_url( $this->uri, PHP_URL_SCHEME )) ? strtolower( $scheme ) : '';
+        $this->user         = ( $scheme = parse_url( $this->uri, PHP_URL_USER )) ? strtolower( $scheme ) : '';
+        $this->pass         = ( $scheme = parse_url( $this->uri, PHP_URL_PASS )) ? strtolower( $scheme ): '';
+        $this->host         = ( $scheme = parse_url( $this->uri, PHP_URL_HOST )) ? strtolower( $scheme ) : '';
+        $this->port         = ( $scheme = parse_url( $this->uri, PHP_URL_HOST )) ? strtolower( $scheme ) : '';
+        $this->path         = ( $scheme = parse_url( $this->uri, PHP_URL_PATH )) ? strtolower( $scheme ) : '';
+        $this->query        = ( $scheme = parse_url( $this->uri, PHP_URL_QUERY )) ? strtolower( $scheme ) : '';
+        $this->fragement    = ( $scheme = parse_url( $this->uri, PHP_URL_FRAGMENT )) ? strtolower( $scheme ) : '';
     }
 
     /**
@@ -204,12 +199,16 @@ class Uri
     public function __toString(): string
     {
         $uri = '';
+
         if( !empty( $this->get_scheme() ))
             $uri .= $this->get_scheme().':';
 
         if( !empty( $this->get_authority()  ))
             $uri .= '//'.$this->get_authority();
 
-       return $uri.$this->get_path().$this->get_query().$this->get_fragment();
+        if( !empty( $this->get_authority()  ))
+            $uri .= '//'.$this->get_authority();
+
+        return $uri.$this->get_path().$this->get_query_string().$this->get_fragment();
     }
 }
